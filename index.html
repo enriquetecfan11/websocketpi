@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cliente WebSocket</title>
+  <link href="styles.css" rel="stylesheet">
+</head>
+
+<body>
+  <h1>Cliente WebSocket</h1>
+  <div class="chat-box" id="chat-box">
+    <p id="message-box"></p>
+    <input type="text" id="message-input" placeholder="Escribe un mensaje">
+    <button id="send-button" onclick="enviarMensaje()">Enviar</button>
+
+  </div>
+
+  <script>
+    const socket = new WebSocket('ws://localhost:8765');
+    socket.onopen = function (event) {
+      console.log('Conectado al servidor WebSocket');
+    };
+  
+    // Escuchar mensajes del servidor y mostrarlos en el chat id="message-box"
+    socket.onmessage = function (event) {
+      console.log('Mensaje recibido:', event.data);
+  
+      let parsedMessage;
+      try {
+        parsedMessage = JSON.parse(event.data);
+      } catch (error) {
+        // Si no se puede analizar como JSON, mostrar el mensaje normalmente
+        parsedMessage = null;
+      }
+  
+      const messageBox = document.getElementById('message-box');
+      const newMessage = document.createElement('p');
+  
+      if (parsedMessage !== null) {
+        // Si es un objeto JSON, dejar el mensaje en blanco
+        newMessage.innerText = ''; // Mostrar el mensaje en blanco
+      } else {
+        newMessage.innerText = event.data; // Mostrar el mensaje normalmente
+      }
+  
+      messageBox.appendChild(newMessage);
+    };
+  
+    function enviarMensaje() {
+      const mensaje = document.getElementById('message-input').value;
+      socket.send(mensaje);
+    }
+  
+  </script>
+  
+</body>
+
+</html>
